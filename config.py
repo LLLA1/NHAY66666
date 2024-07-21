@@ -35,7 +35,7 @@ HEROKU_API_KEY = getenv("HEROKU_API_KEY")
 
 UPSTREAM_REPO = getenv(
     "UPSTREAM_REPO",
-    "https://github.com/LLLA1/NHAY3",
+    "https://github.com/Khayalrashk/NHAY3",
 )
 UPSTREAM_BRANCH = getenv("UPSTREAM_BRANCH", "master")
 APK = 5140000000
