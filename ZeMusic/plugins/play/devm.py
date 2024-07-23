@@ -7,7 +7,7 @@ from strings.filters import command
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton, ReplyKeyboardMarkup
 from pyrogram.errors import MessageNotModified
 from ZeMusic import app
-from config import OWNER_ID, LOGGER_ID
+from config import OWNER_ID, LOGGER_ID, BOT_NAME
 import config
 from random import  choice, randint
 
@@ -22,12 +22,11 @@ async def devid(client: Client, message: Message):
        
     await message.reply_photo(
         photo="downloads/developer.jpg",
-        caption=f"""<b>• Dev Bot ↦ لول\n━━━━━━━━━━━━\n• Dev ↦  {name}\n• Bio ↦ {bio}""",
+        caption=f"""<b>• Dev Bot ↦ {BOT_NAME}\n━━━━━━━━━━━━\n• Dev ↦  <a href="https://t.me/{usrnam}"> {name}</a>\n• Bio ↦ {bio}""",
         reply_markup=InlineKeyboardMarkup(
             [
                 [
-                    InlineKeyboardButton(
-                        text=config.CHANNEL_NAME, url=config.CHANNEL_LINK),
+                    InlineKeyboardButton(name, url=f"https://t.me/{usrnam}"),
                 ],
             ]
         ),
