@@ -14,10 +14,10 @@ def start_panel(_):
         ],
         [InlineKeyboardButton(text="الأوامر", callback_data="zzzback")],
         [
-            InlineKeyboardButton(text="𝐃𝐞𝐯", user_id=config.OWNER_ID),
-            InlineKeyboardButton(text=config.CHANNEL_NAME, url=config.CHANNEL_LINK)
+            InlineKeyboardButton(text="السورس", url=config.CHANNEL_LINK),
+            InlineKeyboardButton(text="المتجر", url=f"https://t.me/YMMYN")
         ],
-        [InlineKeyboardButton(text="𝐒𝐨𝐮𝐫𝐜𝐞 𝐥𝐨𝐥 🧚‍♀", url=f"https://t.me/K55DD"),
+        [InlineKeyboardButton(text="𝐃𝐞𝐯 𝐖𝐨𝐫𝐝", url=f"https://t.me/KHAYAL70"),
 ],
 
     ]
@@ -34,10 +34,10 @@ def private_panel(_):
         ],
         [InlineKeyboardButton(text="الأوامر", callback_data="zzzback")],
         [
-            InlineKeyboardButton(text="𝐃𝐞𝐯", user_id=config.OWNER_ID),
-            InlineKeyboardButton(text=config.CHANNEL_NAME, url=config.CHANNEL_LINK)
+            InlineKeyboardButton(text="السورس", url=config.CHANNEL_LINK),
+            InlineKeyboardButton(text="المتجر", url=f"https://t.me/YMMYN")
         ],
-        [InlineKeyboardButton(text="𝐒𝐨𝐮𝐫𝐜𝐞 𝐥𝐨𝐥 🧚‍♀", url=f"https://t.me/K55DD"),
+        [InlineKeyboardButton(text="𝐃𝐞𝐯 𝐖𝐨𝐫𝐝", url=f"https://t.me/KHAYAL70"),
  ],
     ]
     return buttons
