@@ -18,7 +18,7 @@ from ZeMusic.plugins.play.filters import command
 def remove_if_exists(path):
     if os.path.exists(path):
         os.remove(path)
-        
+channel = "KHAYAL70"       
 lnk = config.CHANNEL_LINK
 Nem = config.BOT_NAME + " ابحث"
 @app.on_message(command(["song", "/song", "بحث", "تنزيل", Nem]))
@@ -59,7 +59,7 @@ async def song_downloader(client, message: Message):
             audio_file = ydl.prepare_filename(info_dict)
             ydl.process_info(info_dict)
         
-        rep = f"⟡ {app.mention}"
+        rep = f"ᴍʏ ᴡᴏʀʟᴅ 𓏺 @{channel} "
         host = str(info_dict["uploader"])
         secmul, dur, dur_arr = 1, 0, duration.split(":")
         for i in range(len(dur_arr) - 1, -1, -1):
