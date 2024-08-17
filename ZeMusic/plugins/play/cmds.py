@@ -9,7 +9,7 @@ from pyrogram.errors import MessageNotModified
 from ZeMusic import app
 from config import OWNER_ID, LOGGER_ID, START_IMG_URL
 import config
-Lnk= "https://t.me/" +config.CHANNEL_LINK
+Lnk= config.CHANNEL_LINK
 
 @app.on_message(filters.regex(r"^(اوامر الميوزك|ميوزك|الميوزك)$"))
 async def zdatsr(client: Client, message: Message):
