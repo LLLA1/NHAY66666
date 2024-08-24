@@ -18,7 +18,7 @@ from ZeMusic.plugins.play.filters import command
 def remove_if_exists(path):
     if os.path.exists(path):
         os.remove(path)
-channel = "KHAYAL70"       
+channel = "eer_5o"              
 lnk = config.CHANNEL_LINK
 Nem = config.BOT_NAME + " ابحث"
 @app.on_message(command(["song", "/song", "بحث", Nem]))
