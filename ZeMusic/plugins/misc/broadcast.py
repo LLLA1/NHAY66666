@@ -37,16 +37,12 @@ async def broadcast_message(client, message, _):
 
     # انتظار رد من OWNER_ID لاختيار النوع
     try:
-        response = await client.listen(message.chat.id, timeout=30)  # إضافة مهلة
-        if response.text == "1":
+        response.text == "1":
             await broadcast_to_chats(message, _)
         elif response.text == "2":
             await broadcast_to_users(message, _)
         else:
             await client.send_message(message.chat.id, "اختيار غير صحيح. البث ملغى.")
-    except asyncio.TimeoutError:
-        await client.send_message(message.chat.id, "لم يتم اختيار نوع البث في الوقت المحدد. البث ملغى.")
-
 async def broadcast_to_chats(message, _):
     global IS_BROADCASTING
     IS_BROADCASTING = True
