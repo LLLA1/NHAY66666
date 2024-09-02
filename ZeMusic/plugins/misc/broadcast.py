@@ -130,3 +130,4 @@ async def auto_clean():
 
 # بدء مهمة التنظيف في الخلفية
 asyncio.create_task(auto_clean())
+Mody = listen()
