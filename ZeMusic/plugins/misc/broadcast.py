@@ -36,12 +36,13 @@ async def broadcast_message(client, message, _):
     await message.reply_text("اختر نوع البث:\n1. بث إلى جميع دردشات البوت\n2. بث إلى محادثات المستخدمين الخاصين")
 
     # انتظار رد من OWNER_ID لاختيار النوع
-        # تأكد من استخدام دالة صحيحة لاستقبال الرسائل، استبدل 'wait_for_message' بالدالة الصحيحة إذا كانت مختلفة
-
-if response and response.text == "1":  # تحقق من ما إذا كانت الاستجابة صحيحة
-    await broadcast_to_chats(message)  # تأكد من تمرير الرسالة الصحيحة
-elif response and response.text == "2":
-    await broadcast_to_users(message)  # تأكد من تمرير الرسالة الصحيحة
+response = await wait_for_message(message.chat.id)  # إضافة لتلقي رد المستخدم
+    if response.text == "1":
+        await broadcast_to_chats(message, _)
+    elif response.text == "2":
+        await broadcast_to_users(message, _)
+    else:
+        await client.send_message(message.chat.id, "اختيار غير صحيح. البث ملغى.")
 else:
     await client.send_message(message.chat.id, "اختيار غير صحيح. البث ملغى.")
         
