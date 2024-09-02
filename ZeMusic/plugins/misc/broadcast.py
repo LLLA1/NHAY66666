@@ -32,30 +32,31 @@ async def broadcast_message(client, message, _):
     global IS_BROADCASTING
     if message.from_user.id != OWNER_ID:
         return await message.reply_text("لا تملك صلاحيات البث.")
-
+    
     await message.reply_text("اختر نوع البث:\n1. بث إلى جميع دردشات البوت\n2. بث إلى محادثات المستخدمين الخاصين")
 
     # انتظار رد من OWNER_ID لاختيار النوع
-    try:
-        response.text == "1":
-            await broadcast_to_chats(message, _)
-        elif response.text == "2":
-            await broadcast_to_users(message, _)
-        else:
-            await client.send_message(message.chat.id, "اختيار غير صحيح. البث ملغى.")
+    response = await client.listen(message.chat.id)  # إضافة لتلقي رد المستخدم
+    if response.text == "1":
+        await broadcast_to_chats(message, _)
+    elif response.text == "2":
+        await broadcast_to_users(message, _)
+    else:
+        await client.send_message(message.chat.id, "اختيار غير صحيح. البث ملغى.")
+
 async def broadcast_to_chats(message, _):
     global IS_BROADCASTING
     IS_BROADCASTING = True
+    
     if message.reply_to_message:
-        x = message.reply_to_message.id
-        y = message.chat.id
+        query = message.reply_to_message.text  # أخذ الرسالة من الرد
     else:
         if len(message.command) < 2:
             return await message.reply_text(_["broad_2"])
         query = message.text.split(None, 1)[1].strip()
         if query == "":
             return await message.reply_text(_["broad_8"])
-    
+
     await message.reply_text(_["broad_1"])
     
     sent = 0
@@ -72,15 +73,15 @@ async def broadcast_to_chats(message, _):
             print(f"خطأ في إرسال الرسالة إلى الدردشة {chat['chat_id']}: {e}")
             continue
 
-    await message.reply_text(_["broad_3"].format(sent, 0))  # عدد الرسائل المرسلة
+    await message.reply_text(_["broad_3"].format(sent))  # عدد الرسائل المرسلة
     IS_BROADCASTING = False
 
 async def broadcast_to_users(message, _):
     global IS_BROADCASTING
     IS_BROADCASTING = True
+    
     if message.reply_to_message:
-        x = message.reply_to_message.id
-        y = message.chat.id
+        query = message.reply_to_message.text  # أخذ الرسالة من الرد
     else:
         if len(message.command) < 2:
             return await message.reply_text(_["broad_2"])
@@ -115,8 +116,7 @@ async def auto_clean():
             for chat_id in served_chats:
                 if chat_id not in adminlist:
                     adminlist[chat_id] = []
-                    async for user in app.get_chat_members(
-                        chat_id, filter=ChatMembersFilter.ADMINISTRATORS
+                    async for user in app.get_chat_members(chat_id, filter=ChatMembersFilter.ADMINISTRATORS
                     ):
                         if user.privileges.can_manage_video_chats:
                             adminlist[chat_id].append(user.user.id)
