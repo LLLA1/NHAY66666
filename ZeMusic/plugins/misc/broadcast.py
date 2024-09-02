@@ -73,7 +73,7 @@ async def broadcast_to_chats(message, _):
         except FloodWait as fw:
             await asyncio.sleep(int(fw.value))
         except Exception as e:
-print(f"خطأ في إرسال الرسالة إلى الدردشة {chat[ chat_id ]}: {e}")
+            print(f"خطأ في إرسال الرسالة إلى الدردشة {chat['chat_id']}: {e}")
             continue
 
     await message.reply_text(_["broad_3"].format(sent, 0))  # عدد الرسائل المرسلة
@@ -105,7 +105,7 @@ async def broadcast_to_users(message, _):
         except FloodWait as fw:
             await asyncio.sleep(int(fw.value))
         except Exception as e:
-            print(f"خطأ في إرسال الرسالة إلى المستخدم {user[ user_id ]}: {e}")
+            print(f"خطأ في إرسال الرسالة إلى المستخدم {user['user_id']}: {e}")
             continue
     
     await message.reply_text(_["broad_4"].format(susr))
