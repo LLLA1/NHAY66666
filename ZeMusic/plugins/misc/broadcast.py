@@ -1,153 +1,119 @@
 import asyncio
 
+# مكتبة Pyrogram للتفاعل مع Telegram API
 from pyrogram import filters
 from pyrogram.enums import ChatMembersFilter
 from pyrogram.errors import FloodWait
 
-from ZeMusic import app
-from ZeMusic.misc import SUDOERS
-from ZeMusic.utils.database import (
-    get_active_chats,
-    get_authuser_names,
-    get_client,
-    get_served_chats,
-    get_served_users,
-)
-from ZeMusic.utils.decorators.language import language
-from ZeMusic.utils.formatters import alpha_to_int
-from config import adminlist, OWNER_ID
+# استيراد التطبيق والمكونات المختلفة من مشروع ZeMusic
+from ZeMusic import app  # تطبيق البوت
+from ZeMusic.misc import SUDOERS  # قائمة بالمستخدمين الـ SUDOERS
 
+# دوال التعامل مع قاعدة البيانات
+from ZeMusic.utils.database import (
+    get_active_chats,     # دالة للحصول على دردشات نشطة
+    get_authuser_names,   # دالة للحصول على أسماء المستخدمين المعتمدين
+    get_client,           # دالة للحصول على عميل معين
+    get_served_chats,     # دالة للحصول على دردشات البوت
+    get_served_users,     # دالة للحصول على مستخدمي البوت
+)
+
+# إضافات اللغة والتنسيق
+from ZeMusic.utils.decorators.language import language  # دالة معالجة اللغة
+from ZeMusic.utils.formatters import alpha_to_int  # دالة تحويل الألفا إلى عدد صحيح
+
+# إعدادات التكوين
+from config import adminlist, OWNER_ID  # إعدادات المسؤولين ومعرف المالك
 IS_BROADCASTING = False
 
-
-@app.on_message(filters.command(["broadcast","اذاعه"]) & SUDOERS)
+@app.on_message(filters.command(["broadcast", "اذاعه"]) & SUDOERS)
 @language
-async def braodcast_message(client, message, _):
+async def broadcast_message(client, message, _):
     global IS_BROADCASTING
+    if message.from_user.id != OWNER_ID:
+        return await message.reply_text("لا تملك صلاحيات البث.")
+
+    await message.reply_text("اختر نوع البث:\n1. بث إلى جميع دردشات البوت\n2. بث إلى محادثات المستخدمين الخاصين")
+
+    # انتظار رد من OWNER_ID لاختيار النوع
+    try:
+        response = await client.listen(message.chat.id, timeout=30)  # إضافة مهلة
+        if response.text == "1":
+            await broadcast_to_chats(message, _)
+        elif response.text == "2":
+            await broadcast_to_users(message, _)
+        else:
+            await client.send_message(message.chat.id, "اختيار غير صحيح. البث ملغى.")
+    except asyncio.TimeoutError:
+        await client.send_message(message.chat.id, "لم يتم اختيار نوع البث في الوقت المحدد. البث ملغى.")
+
+async def broadcast_to_chats(message, _):
+    global IS_BROADCASTING
+    IS_BROADCASTING = True
     if message.reply_to_message:
         x = message.reply_to_message.id
         y = message.chat.id
     else:
         if len(message.command) < 2:
             return await message.reply_text(_["broad_2"])
-        query = message.text.split(None, 1)[1]
-        if "-pin" in query:
-            query = query.replace("-pin", "")
-        if "-nobot" in query:
-            query = query.replace("-nobot", "")
-        if "-pinloud" in query:
-            query = query.replace("-pinloud", "")
-        if "-assistant" in query:
-            query = query.replace("-assistant", "")
-        if "-user" in query:
-            query = query.replace("-user", "")
+        query = message.text.split(None, 1)[1].strip()
+        if query == "":
+            return await message.reply_text(_["broad_8"])
+    
+    await message.reply_text(_["broad_1"])
+    
+    sent = 0
+    chats = await get_served_chats()
+    
+    for chat in chats:
+        try:
+            await app.send_message(chat["chat_id"], text=query)
+            sent += 1
+            await asyncio.sleep(0.2)
+        except FloodWait as fw:
+            await asyncio.sleep(int(fw.value))
+        except Exception as e:
+print(f"خطأ في إرسال الرسالة إلى الدردشة {chat[ chat_id ]}: {e}")
+            continue
+
+    await message.reply_text(_["broad_3"].format(sent, 0))  # عدد الرسائل المرسلة
+    IS_BROADCASTING = False
+
+async def broadcast_to_users(message, _):
+    global IS_BROADCASTING
+    IS_BROADCASTING = True
+    if message.reply_to_message:
+        x = message.reply_to_message.id
+        y = message.chat.id
+    else:
+        if len(message.command) < 2:
+            return await message.reply_text(_["broad_2"])
+        query = message.text.split(None, 1)[1].strip()
         if query == "":
             return await message.reply_text(_["broad_8"])
 
-    IS_BROADCASTING = True
     await message.reply_text(_["broad_1"])
-
-    if "-nobot" not in message.text:
-        sent = 0
-        pin = 0
-        chats = []
-        schats = await get_served_chats()
-        for chat in schats:
-            chats.append(int(chat["chat_id"]))
-        for i in chats:
-            try:
-                m = (
-                    await app.forward_messages(i, y, x)
-                    if message.reply_to_message
-                    else await app.send_message(i, text=query)
-                )
-                if "-pin" in message.text:
-                    try:
-                        await m.pin(disable_notification=True)
-                        pin += 1
-                    except:
-                        continue
-                elif "-pinloud" in message.text:
-                    try:
-                        await m.pin(disable_notification=False)
-                        pin += 1
-                    except:
-                        continue
-                sent += 1
-                await asyncio.sleep(0.2)
-            except FloodWait as fw:
-                flood_time = int(fw.value)
-                if flood_time > 200:
-                    continue
-                await asyncio.sleep(flood_time)
-            except:
-                continue
+    
+    susr = 0
+    users = await get_served_users()
+    
+    for user in users:
         try:
-            await message.reply_text(_["broad_3"].format(sent, pin))
-        except:
-            pass
-
-    if "-user" in message.text:
-        susr = 0
-        served_users = []
-        susers = await get_served_users()
-        for user in susers:
-            served_users.append(int(user["user_id"]))
-        for i in served_users:
-            try:
-                m = (
-                    await app.forward_messages(i, y, x)
-                    if message.reply_to_message
-                    else await app.send_message(i, text=query)
-                )
-                susr += 1
-                await asyncio.sleep(0.2)
-            except FloodWait as fw:
-                flood_time = int(fw.value)
-                if flood_time > 200:
-                    continue
-                await asyncio.sleep(flood_time)
-            except:
-                pass
-        try:
-            await message.reply_text(_["broad_4"].format(susr))
-        except:
-            pass
-
-    if "-assistant" in message.text:
-        aw = await message.reply_text(_["broad_5"])
-        text = _["broad_6"]
-        from ZeMusic.core.userbot import assistants
-
-        for num in assistants:
-            sent = 0
-            client = await get_client(num)
-            async for dialog in client.get_dialogs():
-                try:
-                    await client.forward_messages(
-                        dialog.chat.id, y, x
-                    ) if message.reply_to_message else await client.send_message(
-                        dialog.chat.id, text=query
-                    )
-                    sent += 1
-                    await asyncio.sleep(3)
-                except FloodWait as fw:
-                    flood_time = int(fw.value)
-                    if flood_time > 200:
-                        continue
-                    await asyncio.sleep(flood_time)
-                except:
-                    continue
-            text += _["broad_7"].format(num, sent)
-        try:
-            await aw.edit_text(text)
-        except:
-            pass
+            await app.send_message(user["user_id"], text=query)
+            susr += 1
+            await asyncio.sleep(0.2)
+        except FloodWait as fw:
+            await asyncio.sleep(int(fw.value))
+        except Exception as e:
+            print(f"خطأ في إرسال الرسالة إلى المستخدم {user[ user_id ]}: {e}")
+            continue
+    
+    await message.reply_text(_["broad_4"].format(susr))
     IS_BROADCASTING = False
 
-
 async def auto_clean():
-    while not await asyncio.sleep(10):
+    while True:
+        await asyncio.sleep(10)
         try:
             served_chats = await get_active_chats()
             for chat_id in served_chats:
@@ -162,8 +128,9 @@ async def auto_clean():
                     for user in authusers:
                         user_id = await alpha_to_int(user)
                         adminlist[chat_id].append(user_id)
-        except:
+        except Exception as e:
+            print(f"خطأ في تحديث المسؤولين: {e}")
             continue
 
-
+# بدء مهمة التنظيف في الخلفية
 asyncio.create_task(auto_clean())
