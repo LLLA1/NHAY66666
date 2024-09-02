@@ -36,7 +36,6 @@ async def broadcast_message(client, message, _):
     await message.reply_text("اختر نوع البث:\n1. بث إلى جميع دردشات البوت\n2. بث إلى محادثات المستخدمين الخاصين")
 
     # انتظار رد من OWNER_ID لاختيار النوع
-response = await wait_for_message(message.chat.id)  # إضافة لتلقي رد المستخدم
 if response.text == "1":
     await broadcast_to_chats(message, _)
 elif response.text == "2":
