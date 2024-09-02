@@ -37,7 +37,6 @@ async def broadcast_message(client, message, _):
 
     # انتظار رد من OWNER_ID لاختيار النوع
         # تأكد من استخدام دالة صحيحة لاستقبال الرسائل، استبدل 'wait_for_message' بالدالة الصحيحة إذا كانت مختلفة
-response = await client.wait_for_message(message.chat.id)  # إضافة لتلقي رد المستخدم
 
 if response and response.text == "1":  # تحقق من ما إذا كانت الاستجابة صحيحة
     await broadcast_to_chats(message)  # تأكد من تمرير الرسالة الصحيحة
